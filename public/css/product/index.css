@@ -1,0 +1,28 @@
+.bd-placeholder-img {
+    font-size: 1.125rem;
+    text-anchor: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+@media (min-width: 768px) {
+    .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+    }
+}
+
+.pagination > li {
+    margin: 0 2px 0 2px;
+}
+
+.pagination > li.active > a {
+    padding: 10px 10px;
+    background: #f2f2f2;
+    border: 1px solid black;
+}
+
+.pagination > li > a {
+    padding: 10px 10px;
+    background: #f2f2f2;
+}
