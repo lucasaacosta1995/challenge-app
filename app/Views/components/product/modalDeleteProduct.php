@@ -9,6 +9,8 @@
             </div>
             <div class="modal-body">
                 ¿Estás seguro de que quieres borrar este elemento?
+                <input type="hidden" class="txt_csrfname_delete" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

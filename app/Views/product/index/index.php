@@ -35,6 +35,7 @@
 <script src="<?= base_url('js/product/crud.js') ?>"></script>
 
 <?php include(APPPATH . 'Views/components/product/modalCreateProduct.php') ?>
+<?php include(APPPATH . 'Views/components/product/modalEditProduct.php') ?>
 <?php include(APPPATH . 'Views/components/product/modalDeleteProduct.php') ?>
 
 </body>

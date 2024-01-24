@@ -9,8 +9,9 @@ use CodeIgniter\Router\RouteCollection;
 $routes->group('producto', ['namespace' => 'App\Controllers', 'filter' => 'auth'], function($routes) {
     $routes->get('/', 'ProductController::index');
     $routes->get('(:num)', 'ProductController::show/$1');
+    $routes->get('edit/(:num)', 'ProductController::edit/$1');
     $routes->post('/', 'ProductController::create');
-    $routes->put('(:num)', 'ProductController::update/$1');
+    $routes->post('update/(:num)', 'ProductController::update/$1');
     $routes->post('delete/(:num)', 'ProductController::delete/$1');
 });
 

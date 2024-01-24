@@ -22,6 +22,8 @@
                         </div>
                     <?php endif; ?>
                     <form action="/auth/attempt-login" method="post">
+                        <input type="hidden" class="txt_csrfname" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+
                         <div class="mb-3">
                             <label for="usuario" class="form-label">Usuario:</label>
                             <input type="text" class="form-control" id="username" name="username" required>

@@ -7,6 +7,7 @@ use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use Config\Logger;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -37,6 +38,9 @@ abstract class BaseController extends Controller
      */
     protected $helpers = [];
 
+    protected $logger;
+
+
     /**
      * Be sure to declare properties for any property fetch you initialized.
      * The creation of dynamic property is deprecated in PHP 8.2.
@@ -54,5 +58,30 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
 
         // E.g.: $this->session = \Config\Services::session();
+    }
+    public function __construct()
+    {
+        // Carga el servicio del logger en el constructor
+        $this->logger = service('logger');
+    }
+
+    function lg($level, $message) {
+
+        // log with default config
+        log_message('critical', 'test {file} {line}');
+
+        // log with custom
+        $loggerConfig = new Logger();
+
+        // or just edit path parameter
+        $customPath = 'logs/otherfolder/';
+        $loggerConfig->handlers['CodeIgniter\Log\Handlers\FileHandler']['path'] = WRITEPATH . $customPath;
+
+        // you need to create the folder manually first
+
+        //then create new instance with the config
+        $logger = new Logger($loggerConfig);
+        $logger->log('critical', 'test other folder {file} {line}');
+
     }
 }

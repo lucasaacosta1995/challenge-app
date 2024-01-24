@@ -32,6 +32,7 @@ class ProductController extends BaseController
      */
     public function index()
     {
+        $this->logRequest('index', []);
         return view('product/index/index');
     }
 
@@ -40,7 +41,13 @@ class ProductController extends BaseController
      */
     public function getProductTable(): string
     {
-        // Configura y obtén los datos paginados
+// Generates a message like: User 123 logged into the system from 127.0.0.1
+        $info = [
+            'id'         => 1,
+            'ip_address' => $this->request->getIPAddress(),
+        ];
+
+        log_message('info', "asdaad");        // Configura y obtén los datos paginados
         $limit = $this->request->getGet('limit') ?? 6;
         $page = $this->request->getGet('page') ?? 1;
         $offset = ($page - 1) * $limit;
@@ -74,6 +81,26 @@ class ProductController extends BaseController
             }
 
             return $this->response->setJSON($product);
+        } catch (\Exception $e) {
+            exit;
+        }
+
+    }
+
+    /**
+     * @param $id
+     * @return ResponseInterface
+     */
+    public function edit($id): ResponseInterface
+    {
+        try {
+            $product = $this->model->getProductById($id);
+
+            if (!$product) {
+                return $this->response->setStatusCode(404)->setJSON(['error' => 'Producto no encontrado']);
+            }
+
+            return $this->response->setJSON(['data' => $product]);
         } catch (\Exception $e) {
             exit;
         }
@@ -122,7 +149,7 @@ class ProductController extends BaseController
             'price' => 'required|numeric',
         ]);
 
-        $data = json_decode($this->request->getBody(), true);
+        $data = $this->request->getPost();
 
         if ($validation->run($data)) {
             try {

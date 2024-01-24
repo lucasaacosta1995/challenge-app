@@ -16,7 +16,7 @@
             <td><?= $product['price'] ?></td>
             <td><?= $product['created_at'] ?></td>
             <td>
-                <button class="btn btn-xs btn-warning">Editar</button>
+                <button class="btn btn-xs btn-warning" onclick="prepEditProduct(<?= $product['id'] ?>)">Editar</button>
                 <button class="btn btn-xs btn-danger" onclick="prepDeleteProduct(<?= $product['id'] ?>)">Eliminar</button>
             </td>
         </tr>
