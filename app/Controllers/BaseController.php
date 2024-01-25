@@ -7,7 +7,7 @@ use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
-use Config\Logger;
+use Config\Services;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -38,7 +38,6 @@ abstract class BaseController extends Controller
      */
     protected $helpers = [];
 
-    protected $logger;
 
 
     /**
@@ -59,29 +58,38 @@ abstract class BaseController extends Controller
 
         // E.g.: $this->session = \Config\Services::session();
     }
-    public function __construct()
+
+    /**
+     * @return void
+     */
+    protected function logRequest()
     {
-        // Carga el servicio del logger en el constructor
-        $this->logger = service('logger');
-    }
+        $url = current_url();
 
-    function lg($level, $message) {
+        $method = $this->request->getMethod();
+        $params = $this->request->uri->getSegments();
 
-        // log with default config
-        log_message('critical', 'test {file} {line}');
+        $body = $method == 'get' && $this->request->getJSON() ?? $this->request->getPost();
 
-        // log with custom
-        $loggerConfig = new Logger();
+        $getData = $this->request->getGet();
+        $postData = $this->request->getPost();
 
-        // or just edit path parameter
-        $customPath = 'logs/otherfolder/';
-        $loggerConfig->handlers['CodeIgniter\Log\Handlers\FileHandler']['path'] = WRITEPATH . $customPath;
-
-        // you need to create the folder manually first
-
-        //then create new instance with the config
-        $logger = new Logger($loggerConfig);
-        $logger->log('critical', 'test other folder {file} {line}');
+        $requestData = [
+            'url'    => $url,
+            'method' => $method,
+            'params' => $params,
+            'body'   => $body,
+            'get'    => $getData,
+            'post'   => $postData,
+            'date' => date('Y-m-d H:i:s'),
+        ];
+        $jsonFilePath = WRITEPATH . 'logs/request_data.json';
+        $jsonData = [];
+        if (file_exists($jsonFilePath)) {
+            $jsonData = json_decode(file_get_contents($jsonFilePath), true);
+        }
+        $jsonData[] = $requestData;
+        file_put_contents($jsonFilePath, json_encode($jsonData, JSON_PRETTY_PRINT));
 
     }
 }

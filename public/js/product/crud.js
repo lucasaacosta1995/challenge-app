@@ -28,8 +28,12 @@ function saveProduct(productData) {
     });
 }
 
+function openModalAddProduct()
+{
+    document.getElementById('addProductForm').reset();$('#addProductModal').modal('show');
+}
+
 function editProduct(id, productData) {
-    console.log("asdasd")
     return new Promise((resolve, reject) => {
         $.ajax({
             url: `/producto/update/${id}`,
@@ -50,7 +54,7 @@ $(document).on('submit', '#addProductForm', function (event) {
     event.preventDefault();
 
     var csrfName = $('.txt_csrfname').attr('name'); // CSRF Token name
-    var csrfHash = $('.txt_csrfname').val(); // CSRF hash
+    var csrfHash = generateHashAjax(); // CSRF hash
 
     var productData = {
         title: $('#title').val(),
@@ -85,7 +89,7 @@ $(document).on('submit', '#editProductForm', function (event) {
     event.preventDefault();
 
     var csrfName = $('.txt_csrfname_edit').attr('name'); // CSRF Token name
-    var csrfHash = $('.txt_csrfname_edit').val(); // CSRF hash
+    var csrfHash = generateHashAjax(); // CSRF hash
 
     var productData = {
         title: $('#title_edit').val(),
@@ -117,6 +121,24 @@ $(document).on('submit', '#editProductForm', function (event) {
             setNewMessage(errors, 'danger-edit');
         });
 });
+
+function filtersList() {
+    var filters = {};
+    var title = $("#titleFilter").val();
+    var price = $("#priceFilter").val();
+    var created = $("#createdFilter").val();
+    if(title.trim() !== "") {
+        filters['title'] = title.trim()
+    }
+    if(price.trim() !== "" && !isNaN(price)) {
+        filters['price'] = price
+    }
+    if(created.trim() !== "") {
+        filters['created_at'] = created.trim()
+    }
+
+    return filters;
+}
 
 function prepEditProduct(id) {
     $('#id_edit').val(id);
@@ -155,7 +177,7 @@ function prepDeleteProduct(id) {
 
 function deleteProduct(id) {
     var csrfName = $('.txt_csrfname_delete').attr('name'); // CSRF Token name
-    var csrfHash = $('.txt_csrfname_delete').val(); // CSRF hash
+    var csrfHash = generateHashAjax() // CSRF hash
 
     var dataSend = {};
     dataSend[csrfName] = csrfHash;
@@ -173,6 +195,25 @@ function deleteProduct(id) {
             }
         });
     });
+}
+
+
+const generateHashAjax = () => {
+    var nuevoToken;
+
+    $.ajax({
+        type: 'GET',
+        url: 'auth/tokencsrf',
+        async: false,
+        success: function (respuesta) {
+            nuevoToken = respuesta.token;
+        },
+        error: function (error) {
+            console.error('Error al obtener el nuevo token CSRF');
+        }
+    });
+
+    return nuevoToken;
 }
 
 function confirmDeleteBtn(id) {

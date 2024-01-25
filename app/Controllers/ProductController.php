@@ -7,6 +7,7 @@ use App\Models\Product;
 use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\HTTP\Response;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\I18n\Time;
 use Config\Services;
 use function PHPUnit\Framework\throwException;
 
@@ -30,9 +31,8 @@ class ProductController extends BaseController
     /**
      * @return string
      */
-    public function index()
+    public function index(): string
     {
-        $this->logRequest('index', []);
         return view('product/index/index');
     }
 
@@ -41,30 +41,50 @@ class ProductController extends BaseController
      */
     public function getProductTable(): string
     {
-// Generates a message like: User 123 logged into the system from 127.0.0.1
-        $info = [
-            'id'         => 1,
-            'ip_address' => $this->request->getIPAddress(),
-        ];
+        $this->logRequest();
 
-        log_message('info', "asdaad");        // Configura y obtén los datos paginados
         $limit = $this->request->getGet('limit') ?? 6;
         $page = $this->request->getGet('page') ?? 1;
         $offset = ($page - 1) * $limit;
 
-        $products = $this->model->getProducts($limit, $offset);
-        $totalProducts = $this->model->getTotalProducts();
+        $title = $this->request->getGet('title');
+        $price = $this->request->getGet('price');
+        $createdAt = $this->request->getGet('created_at');
+
+        $products = $this->filterProducts($this->model->getProducts($limit, $offset), $title, $price, $createdAt);
+        $totalProducts = count($products);
 
         $pager = service('pager');
         $pager->setPath('');
         $pagination = $pager->makeLinks($page, $limit, $totalProducts, 'default_full');
 
         $data = [
-            'data' => $this->model->getProducts($limit, $offset),
+            'data' => $products,
             'pagination' => $pagination
         ];
-
         return view('product/index/table', $data);
+    }
+
+    /**
+     * @param $products
+     * @param $title
+     * @param $price
+     * @param $createdAt
+     * @return array
+     */
+    public function filterProducts($products, $title, $price, $createdAt): array
+    {
+        $filteredData = array_filter($products, function ($item) use ($title) {
+            return empty($title) || stripos($item['title'], $title) !== false;
+        });
+
+        $filteredData = array_filter($filteredData, function ($item) use ($price) {
+            return empty($price) || $item['price'] == $price;
+        });
+
+        return array_filter($filteredData, function ($item) use ($createdAt) {
+            return empty($createdAt) || stripos($item['created_at'], $createdAt) !== false;
+        });
     }
 
     /**
@@ -73,6 +93,8 @@ class ProductController extends BaseController
      */
     public function show($id): ResponseInterface
     {
+        $this->logRequest();
+
         try {
             $product = $this->model->getProductById($id);
 
@@ -93,6 +115,8 @@ class ProductController extends BaseController
      */
     public function edit($id): ResponseInterface
     {
+        $this->logRequest();
+
         try {
             $product = $this->model->getProductById($id);
 
@@ -112,6 +136,7 @@ class ProductController extends BaseController
      */
     public function create(): ResponseInterface
     {
+
         $validation = Services::validation();
         $validation->setRules([
             'title' => 'required|min_length[3]|max_length[255]',
@@ -143,6 +168,8 @@ class ProductController extends BaseController
      */
     public function update($id): ResponseInterface
     {
+        $this->logRequest();
+
         $validation = Services::validation();
         $validation->setRules([
             'title' => 'required|min_length[3]|max_length[255]',
@@ -173,6 +200,8 @@ class ProductController extends BaseController
      */
     public function delete($id): ResponseInterface
     {
+        $this->logRequest();
+
         try {
             if (!$this->model->getProductById($id)) {
                 return $this->response->setStatusCode(ResponseInterface::HTTP_NOT_FOUND)->setJSON(['message' => 'Producto no encontrado']);

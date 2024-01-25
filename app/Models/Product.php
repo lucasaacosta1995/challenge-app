@@ -43,11 +43,11 @@ class Product extends Model
 
 
     /**
-     * @param $limit
-     * @param $offset
+     * @param int $limit
+     * @param int $offset
      * @return array
      */
-    public function getProducts($limit, $offset): array
+    public function getProducts(int $limit, int $offset): array
     {
 
         $products = $this->loadProducts();
@@ -56,31 +56,24 @@ class Product extends Model
     }
 
     /**
-     * @return int
+     * @return array|null
      */
-    public function getTotalProducts(): int
-    {
-        $products = $this->loadProducts();
-
-        return count($products);
-    }
-
-    public function loadProducts()
+    public function loadProducts() : ?array
     {
         $products = [];
 
         if (file_exists($this->jsonFilePath) & !empty(file_get_contents($this->jsonFilePath))) {
-            $products =  json_decode(file_get_contents($this->jsonFilePath), true);
+            $products = json_decode(file_get_contents($this->jsonFilePath), true);
         }
 
         return $products;
     }
 
     /**
-     * @param $id
-     * @return mixed|null
+     * @param int $id
+     * @return array|null
      */
-    public function getProductById($id)
+    public function getProductById(int $id): ?array
     {
         $products = $this->loadProducts();
         foreach ($products as $product) {
@@ -92,20 +85,24 @@ class Product extends Model
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @return void
+     * @throws \Exception
      */
-    public function createProduct($data)
+    public function createProduct(array $data)
     {
         $products = $this->loadProducts();
         $products[] = array_merge(array(
-            'id' => $this->generateId(),
-            'created_at' => Time::now()->toLocalizedString('yyyy-MM-dd HH:mm:ss'),
+            'id' => $data['id'] ?? $this->generateId(),
+            'created_at' => Time::now()->toLocalizedString('yyyy-MM-dd HH:mm'),
             'modified_at' => ''), $data);
         $this->updateFileJson($products);
     }
 
-    private function generateId()
+    /**
+     * @return int|mixed|string
+     */
+    private function generateId(): int
     {
         $products = $this->loadProducts();
 
@@ -115,16 +112,17 @@ class Product extends Model
     }
 
     /**
-     * @param $id
-     * @param $data
+     * @param int $id
+     * @param array $data
      * @return bool
+     * @throws \Exception
      */
-    public function updateProduct($id, $data): bool
+    public function updateProduct(int $id, array $data): bool
     {
         $products = $this->loadProducts();
         foreach ($products as &$product) {
             if ($product['id'] == $id) {
-                $product['modified_at'] = Time::now()->toLocalizedString('yyyy-MM-dd HH:mm:ss');;
+                $product['modified_at'] = Time::now()->toLocalizedString('yyyy-MM-dd HH:mm');
                 $product = array_merge($product, $data);
                 $this->updateFileJson($products);
                 return true;
@@ -134,10 +132,10 @@ class Product extends Model
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return void
      */
-    public function deleteProduct($id)
+    public function deleteProduct(int $id)
     {
         $products = $this->loadProducts();
         $products = array_filter($products, function ($product) use ($id) {
@@ -147,10 +145,10 @@ class Product extends Model
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @return void
      */
-    private function updateFileJson($data)
+    private function updateFileJson(array $data)
     {
         $jsonString = json_encode($data, JSON_PRETTY_PRINT);
         file_put_contents($this->jsonFilePath, $jsonString);

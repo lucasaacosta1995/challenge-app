@@ -9,10 +9,13 @@
 
 
 function loadProductTable(page) {
+    var filtersData = filtersList();
+    var mergedFiltersData = Object.assign({},filtersData,page);
+
     $.ajax({
         url: 'ajax/producto/get-product-table',
         method: 'GET',
-        data: page,
+        data: mergedFiltersData,
         dataType: 'html',
         success: function (data) {
             $('#table-container').html(data);

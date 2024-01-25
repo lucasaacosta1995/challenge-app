@@ -15,17 +15,52 @@
 
     <?php include(APPPATH . 'Views/components/sidebar/sidebar.php') ?>
 
-    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <div class="container mt-4">
-            <div class="alert alert-success message-crud" id="message-type-success" role="alert" style="display: none">
-                <span id="message-type-text-success"></span>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-success message-crud" id="message-type-success" role="alert"
+                     style="display: none">
+                    <span id="message-type-text-success"></span>
+                </div>
             </div>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                Agregar Producto
-            </button>
-            <div id="table-container" ></div>
+            <div class="col-12">
+                <button type="button" class="btn btn-primary"  onclick="openModalAddProduct()">
+                    Agregar Producto
+                </button>
+            </div>
+            <div class="col-12 mt-5">
+                <form id="filterForm">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="title" class="form-label">Titulo</label>
+                            <input type="text" class="form-control" id="titleFilter" name="title">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="price" class="form-label">Precio</label>
+                            <input type="number" class="form-control" id="priceFilter" name="price">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="created_at" class="form-label">Fecha creacion</label>
+                            <input type="text" class="form-control" id="createdFilter" name="createdFilter"
+                                   placeholder="yyyy-MM-dd HH:mm">
+                        </div>
+                        <div class="col-md-3" style="margin-top: 30px;">
+                            <button type="button" class="btn btn-primary" onclick="loadProductTable({page: 1})">
+                                Filtrar
+                            </button>
+                            <a href="/producto" class="btn btn-secondary">Limpiar</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-    </main>
+        <div class="row mt-5">
+            <div id="table-container"></div>
+
+        </div>
+
+    </div>
 </main>
 
 

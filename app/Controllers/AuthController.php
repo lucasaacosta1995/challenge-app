@@ -9,15 +9,11 @@ use CodeIgniter\HTTP\ResponseInterface;
 class AuthController extends BaseController
 {
     /**
-     * @return \CodeIgniter\HTTP\RedirectResponse
-     */
-
-    /**
      * @return \CodeIgniter\HTTP\RedirectResponse|string
      */
     public function login()
     {
-        if(!session()->get('logged_in')) {
+        if (!session()->get('logged_in')) {
             return view('auth/login');
         }
 
@@ -25,6 +21,9 @@ class AuthController extends BaseController
 
     }
 
+    /**
+     * @return \CodeIgniter\HTTP\RedirectResponse
+     */
     public function attemptLogin(): \CodeIgniter\HTTP\RedirectResponse
     {
         // Lógica para validar credenciales y realizar el inicio de sesión
@@ -51,5 +50,15 @@ class AuthController extends BaseController
     {
         session()->destroy();
         return redirect()->to('/auth/login');
+    }
+
+    /**
+     * @return ResponseInterface
+     */
+    public function generateTokenCSRF(): ResponseInterface
+    {
+        $nuevoToken = csrf_hash();
+
+        return $this->response->setJSON(['token' => $nuevoToken]);
     }
 }
